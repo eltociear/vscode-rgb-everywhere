@@ -1,0 +1,67 @@
+{
+  "name": "vscode-rgb-everywhere",
+  "displayName": "RGB Everywhere",
+  "description": "Animate status bar font color with a continuous rainbow effect",
+  "version": "0.0.1",
+  "publisher": "eltociear",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eltociear/vscode-rgb-everywhere"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Themes",
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "rgb-everywhere.enable",
+        "title": "RGB Everywhere: Enable Rainbow Effect"
+      },
+      {
+        "command": "rgb-everywhere.disable",
+        "title": "RGB Everywhere: Disable Rainbow Effect"
+      },
+      {
+        "command": "rgb-everywhere.status",
+        "title": "RGB Everywhere: Check Status"
+      }
+    ],
+    "configuration": {
+      "title": "RGB Everywhere",
+      "properties": {
+        "rgbEverywhere.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable rainbow animation on status bar"
+        },
+        "rgbEverywhere.animationSpeed": {
+          "type": "number",
+          "default": 2,
+          "minimum": 0.5,
+          "maximum": 10,
+          "description": "Animation speed in seconds (lower = faster)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.3.0"
+  }
+}
