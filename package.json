@@ -5,6 +5,7 @@
   "version": "0.0.1",
   "publisher": "eltociear",
   "license": "MIT",
+  "icon": "icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/eltociear/vscode-rgb-everywhere"
