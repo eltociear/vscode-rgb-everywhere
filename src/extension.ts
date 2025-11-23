@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as crypto from 'crypto';
 
 const HTML_MARKER_START = '<!-- RGB-EVERYWHERE-START -->';
 const HTML_MARKER_END = '<!-- RGB-EVERYWHERE-END -->';
@@ -150,6 +151,51 @@ class ScriptInjector {
         return null;
     }
 
+    private getProductJsonPath(): string {
+        const appRoot = vscode.env.appRoot;
+        return path.join(appRoot, 'product.json');
+    }
+
+    private computeChecksum(filePath: string): string {
+        const content = fs.readFileSync(filePath);
+        return crypto.createHash('md5').update(content).digest('base64').replace(/=+$/, '');
+    }
+
+    private getChecksumKey(htmlPath: string): string {
+        const appRoot = vscode.env.appRoot;
+        // Get relative path from appRoot/out
+        const outPath = path.join(appRoot, 'out');
+        const relativePath = path.relative(outPath, htmlPath);
+        return relativePath.replace(/\\/g, '/');
+    }
+
+    private updateChecksum(htmlPath: string): void {
+        try {
+            const productJsonPath = this.getProductJsonPath();
+            if (!fs.existsSync(productJsonPath)) {
+                log('product.json not found, skipping checksum update');
+                return;
+            }
+
+            const productJson = JSON.parse(fs.readFileSync(productJsonPath, 'utf8'));
+            if (!productJson.checksums) {
+                log('No checksums in product.json, skipping');
+                return;
+            }
+
+            const checksumKey = this.getChecksumKey(htmlPath);
+            const newChecksum = this.computeChecksum(htmlPath);
+
+            log(`Updating checksum for ${checksumKey}: ${newChecksum}`);
+            productJson.checksums[checksumKey] = newChecksum;
+
+            fs.writeFileSync(productJsonPath, JSON.stringify(productJson, null, '\t'));
+            log('Checksum updated successfully');
+        } catch (error: any) {
+            log(`Failed to update checksum: ${error.message}`);
+        }
+    }
+
     private getJsPath(htmlPath: string): string {
         return path.join(path.dirname(htmlPath), JS_FILENAME);
     }
@@ -272,6 +318,9 @@ ${HTML_MARKER_END}`;
             log(`Writing modified HTML (${html.length} bytes) to: ${htmlPath}`);
             fs.writeFileSync(htmlPath, html);
 
+            // Update checksum to prevent "corrupt installation" warning
+            this.updateChecksum(htmlPath);
+
             // Verify write
             const verifyContent = fs.readFileSync(htmlPath, 'utf8');
             if (verifyContent.includes(HTML_MARKER_START)) {
@@ -327,6 +376,9 @@ ${HTML_MARKER_END}`;
             }
 
             fs.writeFileSync(htmlPath, html);
+
+            // Update checksum to prevent "corrupt installation" warning
+            this.updateChecksum(htmlPath);
 
             // Remove JS file
             if (fs.existsSync(jsPath)) {

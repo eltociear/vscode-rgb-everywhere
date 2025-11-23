@@ -2,7 +2,7 @@
   "name": "vscode-rgb-everywhere",
   "displayName": "RGB Everywhere",
   "description": "Animate status bar font color with a continuous rainbow effect",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "eltociear",
   "license": "MIT",
   "icon": "icon.png",
