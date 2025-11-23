@@ -1,2 +1,2 @@
-# vscode-chroma-statusbar
-Transforms your VS Code status bar into a dynamic Chroma-style RGB cycle. Pure gaming aesthetics for your editor.
+# 🌈 VSCode RGB Everywhere
+Turns your entire VS Code UI into a dynamic RGB light show. Pure gaming aesthetics—everywhere.
