@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as crypto from 'crypto';
 
 const HTML_MARKER_START = '<!-- RGB-EVERYWHERE-START -->';
 const HTML_MARKER_END = '<!-- RGB-EVERYWHERE-END -->';
@@ -84,13 +83,16 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    // Auto-inject on first activation if enabled
+    // Auto-inject on activation (including first install)
     const config = vscode.workspace.getConfiguration('rgbEverywhere');
     if (config.get('enabled', true)) {
         log('Auto-inject enabled, attempting injection...');
         injector.inject().then(result => {
             log(`Auto-inject result: ${JSON.stringify(result)}`);
-            if (!result.success && !result.alreadyInjected) {
+            if (result.success && !result.alreadyInjected) {
+                // First time injection - prompt restart
+                promptRestart('Rainbow effect enabled!');
+            } else if (!result.success) {
                 log(`Auto-inject failed: ${result.message}`);
             }
         }).catch(err => {
@@ -156,43 +158,51 @@ class ScriptInjector {
         return path.join(appRoot, 'product.json');
     }
 
-    private computeChecksum(filePath: string): string {
-        const content = fs.readFileSync(filePath);
-        return crypto.createHash('md5').update(content).digest('base64').replace(/=+$/, '');
-    }
-
-    private getChecksumKey(htmlPath: string): string {
-        const appRoot = vscode.env.appRoot;
-        // Get relative path from appRoot/out
-        const outPath = path.join(appRoot, 'out');
-        const relativePath = path.relative(outPath, htmlPath);
-        return relativePath.replace(/\\/g, '/');
-    }
-
-    private updateChecksum(htmlPath: string): void {
+    private disableChecksumValidation(): void {
         try {
             const productJsonPath = this.getProductJsonPath();
             if (!fs.existsSync(productJsonPath)) {
-                log('product.json not found, skipping checksum update');
+                log('product.json not found, skipping checksum disable');
                 return;
             }
 
             const productJson = JSON.parse(fs.readFileSync(productJsonPath, 'utf8'));
-            if (!productJson.checksums) {
-                log('No checksums in product.json, skipping');
-                return;
+
+            // Remove checksums entirely to disable integrity check
+            if (productJson.checksums) {
+                // Backup original checksums if not already backed up
+                const backupPath = productJsonPath + '.rgb-backup';
+                if (!fs.existsSync(backupPath)) {
+                    log(`Creating product.json backup at: ${backupPath}`);
+                    fs.writeFileSync(backupPath, fs.readFileSync(productJsonPath, 'utf8'));
+                }
+
+                delete productJson.checksums;
+                fs.writeFileSync(productJsonPath, JSON.stringify(productJson, null, '\t'));
+                log('Checksums removed from product.json - integrity check disabled');
+            } else {
+                log('No checksums in product.json, already disabled');
             }
-
-            const checksumKey = this.getChecksumKey(htmlPath);
-            const newChecksum = this.computeChecksum(htmlPath);
-
-            log(`Updating checksum for ${checksumKey}: ${newChecksum}`);
-            productJson.checksums[checksumKey] = newChecksum;
-
-            fs.writeFileSync(productJsonPath, JSON.stringify(productJson, null, '\t'));
-            log('Checksum updated successfully');
         } catch (error: any) {
-            log(`Failed to update checksum: ${error.message}`);
+            log(`Failed to disable checksum validation: ${error.message}`);
+        }
+    }
+
+    private restoreChecksumValidation(): void {
+        try {
+            const productJsonPath = this.getProductJsonPath();
+            const backupPath = productJsonPath + '.rgb-backup';
+
+            if (fs.existsSync(backupPath)) {
+                // Restore original product.json with checksums
+                fs.copyFileSync(backupPath, productJsonPath);
+                fs.unlinkSync(backupPath);
+                log('Restored original product.json with checksums');
+            } else {
+                log('No product.json backup found, skipping restore');
+            }
+        } catch (error: any) {
+            log(`Failed to restore checksum validation: ${error.message}`);
         }
     }
 
@@ -318,8 +328,8 @@ ${HTML_MARKER_END}`;
             log(`Writing modified HTML (${html.length} bytes) to: ${htmlPath}`);
             fs.writeFileSync(htmlPath, html);
 
-            // Update checksum to prevent "corrupt installation" warning
-            this.updateChecksum(htmlPath);
+            // Disable checksum validation to prevent "corrupt installation" warning
+            this.disableChecksumValidation();
 
             // Verify write
             const verifyContent = fs.readFileSync(htmlPath, 'utf8');
@@ -377,14 +387,14 @@ ${HTML_MARKER_END}`;
 
             fs.writeFileSync(htmlPath, html);
 
-            // Update checksum to prevent "corrupt installation" warning
-            this.updateChecksum(htmlPath);
-
             // Remove JS file
             if (fs.existsSync(jsPath)) {
                 fs.unlinkSync(jsPath);
                 log('JS file removed successfully');
             }
+
+            // Restore checksum validation
+            this.restoreChecksumValidation();
 
             return { success: true, message: 'Script removed successfully' };
         } catch (error: any) {
