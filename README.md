@@ -36,25 +36,31 @@ Open Command Palette (`Cmd+Shift+P` / `Ctrl+Shift+P`) and run:
 |---------|------|---------|-------------|
 | `rgbEverywhere.enabled` | boolean | `true` | Auto-inject RGB animation on startup |
 | `rgbEverywhere.animationSpeed` | number | `2` | Animation cycle time in seconds (0.5–10) |
-| `rgbEverywhere.targetAreas` | object | see below | Target areas for rainbow effect |
+| `rgbEverywhere.target.*` | boolean | `true` | Target areas for rainbow effect |
 
 ### Target Areas
 
-Configure which parts of VS Code should have the rainbow effect:
+Configure which parts of VS Code should have the rainbow effect (all enabled by default):
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `rgbEverywhere.target.statusbar` | `true` | Status bar (bottom) |
+| `rgbEverywhere.target.sidebar` | `true` | Sidebar (file explorer, extensions, etc.) |
+| `rgbEverywhere.target.activitybar` | `true` | Activity bar (leftmost icons) |
+| `rgbEverywhere.target.titlebar` | `true` | Title bar (top) |
+| `rgbEverywhere.target.panel` | `true` | Panel area UI (terminal tabs, output tabs, etc.) |
+| `rgbEverywhere.target.editor` | `true` | Editor area (code text) |
+| `rgbEverywhere.target.tabs` | `true` | Tab bar (editor tabs) |
+| `rgbEverywhere.target.breadcrumbs` | `true` | Breadcrumbs (file path navigation) |
+| `rgbEverywhere.target.menubar` | `true` | Menu bar (File, Edit, View, etc.) |
+| `rgbEverywhere.target.auxiliarybar` | `true` | Secondary sidebar (right side) |
+
+To disable specific areas, set them to `false` in your settings:
 
 ```json
-"rgbEverywhere.targetAreas": {
-  "statusbar": true,      // Status bar (bottom)
-  "sidebar": false,       // Sidebar (file explorer, extensions, etc.)
-  "activitybar": false,   // Activity bar (leftmost icons)
-  "titlebar": false,      // Title bar (top)
-  "panel": false,         // Panel (terminal, output, etc.)
-  "editor": false,        // Editor area (code text)
-  "tabs": false,          // Tab bar (editor tabs)
-  "minimap": false,       // Minimap (code overview)
-  "breadcrumbs": false,   // Breadcrumbs (file path navigation)
-  "menubar": false,       // Menu bar (File, Edit, View, etc.)
-  "auxiliarybar": false   // Secondary sidebar (right side)
+{
+  "rgbEverywhere.target.editor": false,
+  "rgbEverywhere.target.sidebar": false
 }
 ```
 

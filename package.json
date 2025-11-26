@@ -2,7 +2,7 @@
   "name": "vscode-rgb-everywhere",
   "displayName": "RGB Everywhere",
   "description": "Animate status bar font color with a continuous rainbow effect",
-  "version": "0.0.6",
+  "version": "0.0.11",
   "publisher": "eltociear",
   "license": "MIT",
   "icon": "icon.png",
@@ -51,79 +51,55 @@
           "maximum": 10,
           "description": "Animation speed in seconds (lower = faster)"
         },
-        "rgbEverywhere.targetAreas": {
-          "type": "object",
-          "default": {
-            "statusbar": true,
-            "sidebar": false,
-            "activitybar": false,
-            "titlebar": false,
-            "panel": false,
-            "editor": false,
-            "tabs": false,
-            "minimap": false,
-            "breadcrumbs": false,
-            "menubar": false,
-            "auxiliarybar": false
-          },
-          "description": "Target areas for rainbow effect",
-          "properties": {
-            "statusbar": {
-              "type": "boolean",
-              "default": true,
-              "description": "Status bar (bottom)"
-            },
-            "sidebar": {
-              "type": "boolean",
-              "default": false,
-              "description": "Sidebar (file explorer, extensions, etc.)"
-            },
-            "activitybar": {
-              "type": "boolean",
-              "default": false,
-              "description": "Activity bar (leftmost icons)"
-            },
-            "titlebar": {
-              "type": "boolean",
-              "default": false,
-              "description": "Title bar (top)"
-            },
-            "panel": {
-              "type": "boolean",
-              "default": false,
-              "description": "Panel (terminal, output, etc.)"
-            },
-            "editor": {
-              "type": "boolean",
-              "default": false,
-              "description": "Editor area (code text)"
-            },
-            "tabs": {
-              "type": "boolean",
-              "default": false,
-              "description": "Tab bar (editor tabs)"
-            },
-            "minimap": {
-              "type": "boolean",
-              "default": false,
-              "description": "Minimap (code overview)"
-            },
-            "breadcrumbs": {
-              "type": "boolean",
-              "default": false,
-              "description": "Breadcrumbs (file path navigation)"
-            },
-            "menubar": {
-              "type": "boolean",
-              "default": false,
-              "description": "Menu bar (File, Edit, View, etc.)"
-            },
-            "auxiliarybar": {
-              "type": "boolean",
-              "default": false,
-              "description": "Secondary sidebar (right side)"
-            }
-          }
+        "rgbEverywhere.target.statusbar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Status bar (bottom)"
+        },
+        "rgbEverywhere.target.sidebar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Sidebar (file explorer, extensions, etc.)"
+        },
+        "rgbEverywhere.target.activitybar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Activity bar (leftmost icons)"
+        },
+        "rgbEverywhere.target.titlebar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Title bar (top)"
+        },
+        "rgbEverywhere.target.panel": {
+          "type": "boolean",
+          "default": true,
+          "description": "Panel area UI (terminal tabs, output tabs, etc. - Note: terminal text uses Canvas and cannot be colorized)"
+        },
+        "rgbEverywhere.target.editor": {
+          "type": "boolean",
+          "default": true,
+          "description": "Editor area (code text)"
+        },
+        "rgbEverywhere.target.tabs": {
+          "type": "boolean",
+          "default": true,
+          "description": "Tab bar (editor tabs)"
+        },
+        "rgbEverywhere.target.breadcrumbs": {
+          "type": "boolean",
+          "default": true,
+          "description": "Breadcrumbs (file path navigation)"
+        },
+        "rgbEverywhere.target.menubar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Menu bar (File, Edit, View, etc.)"
+        },
+        "rgbEverywhere.target.auxiliarybar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Secondary sidebar (right side)"
         }
       }
     }

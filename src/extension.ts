@@ -26,7 +26,6 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Register enable command
     const enableCommand = vscode.commands.registerCommand('rgb-everywhere.enable', async () => {
-        outputChannel.show();
         log('Enable command executed');
 
         const result = await injector.inject();
@@ -45,7 +44,6 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Register disable command
     const disableCommand = vscode.commands.registerCommand('rgb-everywhere.disable', async () => {
-        outputChannel.show();
         log('Disable command executed');
 
         const result = await injector.remove();
@@ -102,7 +100,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Listen for configuration changes and update JS file
     const configListener = vscode.workspace.onDidChangeConfiguration(e => {
-        if (e.affectsConfiguration('rgbEverywhere.targetAreas') ||
+        if (e.affectsConfiguration('rgbEverywhere.target') ||
             e.affectsConfiguration('rgbEverywhere.animationSpeed')) {
             log('Configuration changed, updating JS file...');
             injector.inject().then(result => {
@@ -239,37 +237,25 @@ class ScriptInjector {
         const hueIncrement = Math.round(360 / (speed * 20));
 
         // Build CSS selector based on target areas
-        const targetAreas = config.get<Record<string, boolean>>('targetAreas', {
-            statusbar: true,
-            sidebar: false,
-            activitybar: false,
-            titlebar: false,
-            panel: false,
-            editor: false,
-            tabs: false,
-            minimap: false,
-            breadcrumbs: false,
-            menubar: false,
-            auxiliarybar: false
-        });
+        // Note: Terminal and Minimap use Canvas rendering and cannot be colorized via CSS
+        const targetConfig = vscode.workspace.getConfiguration('rgbEverywhere.target');
 
         const selectorMap: Record<string, string> = {
             statusbar: '.part.statusbar *',
             sidebar: '.part.sidebar *',
             activitybar: '.part.activitybar *',
             titlebar: '.part.titlebar *',
-            panel: '.part.panel *',
-            editor: '.editor-instance *, .monaco-editor *',
+            panel: '.part.panel *:not(canvas)',
+            editor: '.editor-instance *, .monaco-editor .view-lines *',
             tabs: '.tabs-container *, .tab *',
-            minimap: '.minimap *',
-            breadcrumbs: '.breadcrumbs *',
+            breadcrumbs: '.breadcrumbs-wrapper *, .breadcrumbs *',
             menubar: '.menubar *',
             auxiliarybar: '.part.auxiliarybar *'
         };
 
         const selectors: string[] = [];
-        for (const [area, enabled] of Object.entries(targetAreas)) {
-            if (enabled && selectorMap[area]) {
+        for (const area of Object.keys(selectorMap)) {
+            if (targetConfig.get<boolean>(area, area === 'statusbar')) {
                 selectors.push(selectorMap[area]);
             }
         }
