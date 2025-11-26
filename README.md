@@ -36,6 +36,29 @@ Open Command Palette (`Cmd+Shift+P` / `Ctrl+Shift+P`) and run:
 |---------|------|---------|-------------|
 | `rgbEverywhere.enabled` | boolean | `true` | Auto-inject RGB animation on startup |
 | `rgbEverywhere.animationSpeed` | number | `2` | Animation cycle time in seconds (0.5–10) |
+| `rgbEverywhere.targetAreas` | object | see below | Target areas for rainbow effect |
+
+### Target Areas
+
+Configure which parts of VS Code should have the rainbow effect:
+
+```json
+"rgbEverywhere.targetAreas": {
+  "statusbar": true,      // Status bar (bottom)
+  "sidebar": false,       // Sidebar (file explorer, extensions, etc.)
+  "activitybar": false,   // Activity bar (leftmost icons)
+  "titlebar": false,      // Title bar (top)
+  "panel": false,         // Panel (terminal, output, etc.)
+  "editor": false,        // Editor area (code text)
+  "tabs": false,          // Tab bar (editor tabs)
+  "minimap": false,       // Minimap (code overview)
+  "breadcrumbs": false,   // Breadcrumbs (file path navigation)
+  "menubar": false,       // Menu bar (File, Edit, View, etc.)
+  "auxiliarybar": false   // Secondary sidebar (right side)
+}
+```
+
+> Settings changes are automatically detected and will prompt you to restart VS Code.
 
 ---
 

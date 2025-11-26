@@ -61,7 +61,7 @@ Check Output panel (`RGB Everywhere` channel) for debug logs.
 - Updates HSL hue of target elements every 50ms
 - Wave effect: Each element offset by `i * 10` degrees
 - Speed configurable via `rgbEverywhere.animationSpeed` setting
-- Target areas configurable via `rgbEverywhere.targetAreas` (statusbar, sidebar, activitybar, titlebar, panel)
+- Target areas configurable via `rgbEverywhere.targetAreas` (statusbar, sidebar, activitybar, titlebar, panel, editor, tabs, minimap, breadcrumbs, menubar, auxiliarybar)
 
 ## Constraints
 

@@ -244,7 +244,13 @@ class ScriptInjector {
             sidebar: false,
             activitybar: false,
             titlebar: false,
-            panel: false
+            panel: false,
+            editor: false,
+            tabs: false,
+            minimap: false,
+            breadcrumbs: false,
+            menubar: false,
+            auxiliarybar: false
         });
 
         const selectorMap: Record<string, string> = {
@@ -252,7 +258,13 @@ class ScriptInjector {
             sidebar: '.part.sidebar *',
             activitybar: '.part.activitybar *',
             titlebar: '.part.titlebar *',
-            panel: '.part.panel *'
+            panel: '.part.panel *',
+            editor: '.editor-instance *, .monaco-editor *',
+            tabs: '.tabs-container *, .tab *',
+            minimap: '.minimap *',
+            breadcrumbs: '.breadcrumbs *',
+            menubar: '.menubar *',
+            auxiliarybar: '.part.auxiliarybar *'
         };
 
         const selectors: string[] = [];
