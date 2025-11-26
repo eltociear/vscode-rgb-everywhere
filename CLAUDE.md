@@ -15,6 +15,12 @@ npm run lint         # Run ESLint
 vsce package         # Create .vsix (requires: npm i -g @vscode/vsce)
 ```
 
+## After Feature Implementation
+
+1. Bump version in `package.json` (e.g., 0.0.3 → 0.0.4)
+2. Run `npm run compile`
+3. Run `vsce package` to create .vsix
+
 ## Development
 
 Launch Extension Development Host with F5 → Run `RGB Everywhere: Enable Rainbow Effect` from Command Palette → Restart VS Code
@@ -47,9 +53,10 @@ Check Output panel (`RGB Everywhere` channel) for debug logs.
 
 ### Injected JS Behavior
 
-- Updates HSL hue of `.part.statusbar *` elements every 50ms
+- Updates HSL hue of target elements every 50ms
 - Wave effect: Each element offset by `i * 10` degrees
 - Speed configurable via `rgbEverywhere.animationSpeed` setting
+- Target areas configurable via `rgbEverywhere.targetAreas` (statusbar, sidebar, activitybar, titlebar, panel)
 
 ## Constraints
 

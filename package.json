@@ -2,7 +2,7 @@
   "name": "vscode-rgb-everywhere",
   "displayName": "RGB Everywhere",
   "description": "Animate status bar font color with a continuous rainbow effect",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "publisher": "eltociear",
   "license": "MIT",
   "icon": "icon.png",
@@ -50,6 +50,44 @@
           "minimum": 0.5,
           "maximum": 10,
           "description": "Animation speed in seconds (lower = faster)"
+        },
+        "rgbEverywhere.targetAreas": {
+          "type": "object",
+          "default": {
+            "statusbar": true,
+            "sidebar": false,
+            "activitybar": false,
+            "titlebar": false,
+            "panel": false
+          },
+          "description": "Target areas for rainbow effect",
+          "properties": {
+            "statusbar": {
+              "type": "boolean",
+              "default": true,
+              "description": "Status bar (bottom)"
+            },
+            "sidebar": {
+              "type": "boolean",
+              "default": false,
+              "description": "Sidebar (file explorer, extensions, etc.)"
+            },
+            "activitybar": {
+              "type": "boolean",
+              "default": false,
+              "description": "Activity bar (leftmost icons)"
+            },
+            "titlebar": {
+              "type": "boolean",
+              "default": false,
+              "description": "Title bar (top)"
+            },
+            "panel": {
+              "type": "boolean",
+              "default": false,
+              "description": "Panel (terminal, output, etc.)"
+            }
+          }
         }
       }
     }

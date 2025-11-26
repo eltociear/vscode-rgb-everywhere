@@ -100,7 +100,27 @@ export function activate(context: vscode.ExtensionContext) {
         });
     }
 
-    context.subscriptions.push(enableCommand, disableCommand, statusCommand, outputChannel);
+    // Listen for configuration changes and update JS file
+    const configListener = vscode.workspace.onDidChangeConfiguration(e => {
+        if (e.affectsConfiguration('rgbEverywhere.targetAreas') ||
+            e.affectsConfiguration('rgbEverywhere.animationSpeed')) {
+            log('Configuration changed, updating JS file...');
+            injector.inject().then(result => {
+                if (result.success) {
+                    vscode.window.showInformationMessage(
+                        'RGB Everywhere: Settings updated. Restart VS Code to apply changes.',
+                        'Restart Now'
+                    ).then(selection => {
+                        if (selection === 'Restart Now') {
+                            vscode.commands.executeCommand('workbench.action.reloadWindow');
+                        }
+                    });
+                }
+            });
+        }
+    });
+
+    context.subscriptions.push(enableCommand, disableCommand, statusCommand, configListener, outputChannel);
     log('Extension activated');
 }
 
@@ -218,18 +238,47 @@ class ScriptInjector {
         // For a 2-second cycle (360 degrees), we need 360/(2*20) = 9 degrees per frame
         const hueIncrement = Math.round(360 / (speed * 20));
 
+        // Build CSS selector based on target areas
+        const targetAreas = config.get<Record<string, boolean>>('targetAreas', {
+            statusbar: true,
+            sidebar: false,
+            activitybar: false,
+            titlebar: false,
+            panel: false
+        });
+
+        const selectorMap: Record<string, string> = {
+            statusbar: '.part.statusbar *',
+            sidebar: '.part.sidebar *',
+            activitybar: '.part.activitybar *',
+            titlebar: '.part.titlebar *',
+            panel: '.part.panel *'
+        };
+
+        const selectors: string[] = [];
+        for (const [area, enabled] of Object.entries(targetAreas)) {
+            if (enabled && selectorMap[area]) {
+                selectors.push(selectorMap[area]);
+            }
+        }
+
+        // Fallback to statusbar if nothing selected
+        const selector = selectors.length > 0 ? selectors.join(', ') : '.part.statusbar *';
+        log(`Rainbow selector: ${selector}`);
+
         return `// RGB Everywhere Rainbow Effect
 (function() {
     'use strict';
 
     let rgbInterval = null;
     let hue = 0;
+    const selector = '${selector}';
 
     function startRainbow() {
         if (rgbInterval) return;
 
         rgbInterval = setInterval(() => {
-            const items = document.querySelectorAll('.part.statusbar *');
+            const items = document.querySelectorAll(selector);
             if (items.length === 0) return;
 
             hue = (hue + ${hueIncrement}) % 360;
@@ -248,7 +297,7 @@ class ScriptInjector {
         setTimeout(startRainbow, 1000);
     }
 
-    console.log('RGB Everywhere: Rainbow script loaded');
+    console.log('RGB Everywhere: Rainbow script loaded with selector:', selector);
 })();
 `;
     }
@@ -303,10 +352,13 @@ ${HTML_MARKER_END}`;
             // Remove legacy injection if present
             html = this.removeLegacyInjection(html, htmlPath);
 
-            // Check if already injected
+            // Check if already injected - still update JS file with latest settings
             if (html.includes(HTML_MARKER_START)) {
-                log('HTML already contains injection marker');
-                return { success: true, message: 'Already injected', alreadyInjected: true };
+                log('HTML already contains injection marker, updating JS file with current settings');
+                const rainbowScript = this.getRainbowScript();
+                fs.writeFileSync(jsPath, rainbowScript);
+                log(`JS file updated (${rainbowScript.length} bytes)`);
+                return { success: true, message: 'Already injected, JS updated', alreadyInjected: true };
             }
 
             // Create backup of HTML
