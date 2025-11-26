@@ -2,6 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Important
+
+- Always refer to `WORK_LOG.md` for task history and progress tracking.
+- Update `WORK_LOG.md` after completing each task or making changes.
+
 ## Overview
 
 VS Code extension that animates the status bar with continuous rainbow colors. Works by injecting JavaScript into VS Code's internal HTML.
